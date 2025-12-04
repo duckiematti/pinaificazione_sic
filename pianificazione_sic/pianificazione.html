@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pianificazione Corsi 2026 – Dashboard</title>
+
+    <!-- FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: #f4f6f9;
+            color: #333;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* -------------------- SIDEBAR -------------------- */
+        .sidebar {
+            width: 260px;
+            background: #1f2937;
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .sidebar h2 {
+            font-size: 1.4em;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .menu {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu a {
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #d1d5db;
+            font-weight: 500;
+            transition: 0.25s;
+        }
+
+        .menu a:hover {
+            background: #374151;
+            color: white;
+        }
+
+        .menu .active {
+            background: #3740ff;
+            color: white;
+        }
+
+        /* -------------------- MAIN LAYOUT -------------------- */
+        .main {
+            flex-grow: 1;
+            padding: 30px 40px;
+        }
+
+        .topbar {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .topbar h1 {
+            font-size: 1.8em;
+            color: #111827;
+            font-weight: 700;
+        }
+
+        /* -------------------- CARDS -------------------- */
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        }
+
+        .card h2 {
+            font-size: 1.45em;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #111827;
+        }
+
+        .step-number {
+            background: #3740ff;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1em;
+        }
+
+        /* -------------------- BUTTONS -------------------- */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.2s ease;
+            font-size: 0.95em;
+            margin: 5px;
+        }
+
+        .btn-primary { background: #3740ff; color: white; }
+        .btn-primary:hover { background: #2a32d1; }
+
+        .btn-success { background: #22c55e; color: white; }
+        .btn-success:hover { background: #1ea652; }
+
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #d63c3c; }
+
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-secondary:hover { background: #565c68; }
+
+        .action-buttons { margin-top: 15px; }
+
+        /* -------------------- INSTRUCTIONS -------------------- */
+        .instructions {
+            background: #f0f3ff;
+            border-left: 4px solid #3740ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            color: #334155;
+        }
+
+        .instructions ul { padding-left: 20px; }
+
+        .instructions li { margin: 8px 0; }
+
+        /* -------------------- TERMINAL BOXES -------------------- */
+        .command-box,
+        .output-box {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: "Inter", sans-serif;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .command-box {
+            background: #1f1f1f;
+            color: #7fff7f;
+            font-family: "Fira Code", monospace;
+        }
+
+        .output-box {
+            background: #f8f9fa;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+            font-family: "Inter", sans-serif;
+        }
+
+        .output-box.success {
+            background: #f0fdf4;
+            color: #166534;
+            border-color: #bbf7d0;
+        }
+
+        .output-box.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+        /* -------------------- ALERTS -------------------- */
+        .alert {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success { background: #e7f7ec; color: #176b3a; }
+        .alert-error { background: #fde8e8; color: #8c1f1f; }
+        .alert-info { background: #e8f4fc; color: #0e5a78; }
+
+        /* PDF Options */
+        .pdf-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .pdf-option {
+            padding: 18px;
+            border-radius: 12px;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.25s ease;
+            font-weight: 600;
+        }
+
+        .pdf-option:hover {
+            border-color: #3740ff;
+            background: #fff;
+        }
+
+        .hidden { display: none; }
+
+        /* PDF Files */
+        .pdf-files {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #e5e7eb;
+        }
+
+        .pdf-files h3 {
+            margin-bottom: 15px;
+            color: #374151;
+            font-size: 1.1em;
+        }
+
+        .pdf-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .pdf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .pdf-item .filename {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .pdf-item .filesize {
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+
+        /* PDF Options Container */
+        .pdf-options-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .pdf-option-card {
+            background: #f8f9fa;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            transition: 0.3s;
+        }
+
+        .pdf-option-card:hover {
+            border-color: #3740ff;
+            box-shadow: 0 4px 12px rgba(55, 64, 255, 0.1);
+        }
+
+        .pdf-option-card h4 {
+            margin: 0 0 8px 0;
+            color: #1f2937;
+            font-size: 1.1em;
+        }
+
+        .pdf-option-card p {
+            margin: 0 0 15px 0;
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+            font-family: "Inter", sans-serif;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3740ff;
+            box-shadow: 0 0 0 3px rgba(55, 64, 255, 0.1);
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- -------------------- SIDEBAR -------------------- -->
+    <div class="sidebar">
+        <h2>Pianificazione<br>Corsi 2026</h2>
+
+        <nav class="menu">
+            <a href="#" class="active" onclick="showSection('dashboard')">Dashboard</a>
+            <a href="#" onclick="showSection('excel')">Gestione Excel</a>
+            <a href="#" onclick="showSection('pdf')">Genera PDF</a>
+            <a href="#" onclick="showSection('cartella')">Apri Cartella</a>
+        </nav>
+    </div>
+
+    <!-- -------------------- MAIN CONTENT -------------------- -->
+    <div class="main">
+
+        <!-- Topbar -->
+        <div class="topbar">
+            <h1>Pannello di Gestione</h1>
+            <div style="color: #555; font-size: 0.9em;">Server locale richiesto: <code>python3 server.py</code></div>
+        </div>
+
+        <div id="alerts"></div>
+
+        <!-- 🔽 DA QUI IN POI TUTTO IL TUO CONTENUTO ORIGINALE (STEP 1-5 + RESET) 🔽 -->
+        <!-- (È IDENTICO ALL'ORIGINALE, cambia solo lo stile) -->
+        
+        <!-- --- DASHBOARD --- -->
+        <div class="card" id="dashboard" style="display: block;">
+            <h2>🏠 Dashboard Pianificazione Corsi 2026</h2>
+            
+            <div class="instructions">
+                <p><strong>Benvenuto nel sistema di pianificazione corsi 2026!</strong></p>
+                <p>Usa il menu laterale per navigare tra le diverse funzionalità:</p>
+                <ul>
+                    <li><strong>Gestione Excel:</strong> Crea o modifica il file di pianificazione</li>
+                    <li><strong>Genera PDF:</strong> Crea i report in formato PDF</li>
+                    <li><strong>Apri Cartella:</strong> Visualizza i PDF generati</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- --- GESTIONE EXCEL --- -->
+        <div class="card" id="excel" style="display: none;">
+            <h2><span class="step-number">1</span>Gestione File Excel</h2>
+
+            <div class="instructions">
+                <p><strong>📥 Crea o modifica il file di pianificazione</strong></p>
+                <ul>
+                    <li><strong>Crea Template:</strong> Genera il file Excel vuoto con colonne e validazioni</li>
+                    <li><strong>Modifica File:</strong> Apri e compila il foglio di pianificazione</li>
+                    <li>249 giorni lavorativi del 2026</li>
+                    <li>Menu a tendina formatori/aule</li>
+                    <li>Celle rosse = duplicati/incompatibilità</li>
+                </ul>
+            </div>
+
+            <div id="outputExcel" class="output-box hidden"></div>
+
+            <!-- Elemento nascosto per il comando -->
+            <div id="commandExcel" style="display: none;">python3 crea_pianificazione_smart.py</div>
+
+            <div class="action-buttons">
+                <button id="excelButton" onclick="handleExcelAction()" class="btn btn-success">▶️ Scarica Excel</button>
+                <button onclick="openExcel()" class="btn btn-primary">📂 Apri File Excel</button>
+            </div>
+        </div>
+
+        <!-- --- GENERA PDF --- -->
+        <div class="card" id="pdf" style="display: none;">
+            <h2><span class="step-number">2</span>Genera Report PDF</h2>
+
+            <div class="instructions">
+                <p><strong>📄 Scegli il tipo di report da generare</strong></p>
+            </div>
+
+            <!-- PDF Esistenti -->
+            <div id="existingPdfs" class="pdf-files" style="display: none; margin-bottom: 20px;">
+                <h3>📁 PDF Disponibili</h3>
+                <div id="pdfList" class="pdf-list"></div>
+            </div>
+
+            <!-- Opzioni Report -->
+            <div class="pdf-options-container">
+                <h3 style="color: #374151; margin-bottom: 15px;">Seleziona Report:</h3>
+                
+                <!-- Aule per Periodo -->
+                <div class="pdf-option-card">
+                    <h4>📋 Prenotazione Aule</h4>
+                    <p>Scegli il periodo da includere nel report</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                        <input type="date" id="input_aule_data_inizio" placeholder="Data inizio" class="input-field">
+                        <input type="date" id="input_aule_data_fine" placeholder="Data fine" class="input-field">
+                    </div>
+                    <button onclick="generaPDFAule()" class="btn btn-primary">Genera PDF Aule</button>
+                </div>
+
+                <!-- Formatore Specifico -->
+                <div class="pdf-option-card">
+                    <h4>👤 Programma Formatore</h4>
+                    <p>Scegli formatore e periodo</p>
+                    <select id="select_formatore" class="input-field">
+                        <option value="">Caricamento formatori...</option>
+                    </select>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                        <input type="date" id="input_data_inizio" placeholder="Data inizio" class="input-field">
+                        <input type="date" id="input_data_fine" placeholder="Data fine" class="input-field">
+                    </div>
+                    <button onclick="generaPDFFormatore()" class="btn btn-primary">Genera PDF Formatore</button>
+                </div>
+
+                <!-- Corso Specifico -->
+                <div class="pdf-option-card">
+                    <h4>� Programma Corso</h4>
+                    <p>Scegli il corso da stampare</p>
+                    <select id="select_corso" class="input-field">
+                        <option value="">Caricamento corsi...</option>
+                    </select>
+                    <button onclick="generaPDFCorso()" class="btn btn-primary">Genera PDF Corso</button>
+                </div>
+
+                <!-- Report Completi -->
+                <div class="pdf-option-card">
+                    <h4>✅ Report Completi</h4>
+                    <p>Genera tutti i report standard</p>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button onclick="generaPDFTuttiFormatori()" class="btn btn-success">� Tutti Formatori</button>
+                        <button onclick="generaPDFSettimanale()" class="btn btn-success">📅 Settimanale</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="outputPdf" class="output-box hidden"></div>
+        </div>
+
+        <!-- --- APRI CARTELLA --- -->
+        <div class="card" id="cartella" style="display: none;">
+            <h2><span class="step-number">3</span>Apri Cartella PDF</h2>
+
+            <button onclick="openPdfFolder()" class="btn btn-success">📁 Apri Cartella PDF</button>
+        </div>
+    </div>
+
+    <!-- -------------------- JAVASCRIPT (identico al tuo) -------------------- -->
+    <script>
+        const API_URL = 'http://localhost:8765';
+
+        async function handleExcelAction() {
+            // Controlla se il file Excel esiste già
+            try {
+                const response = await fetch(`${API_URL}/api/check-file`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filepath: 'Pianificazione_Corsi_2026.xlsx' })
+                });
+                const result = await response.json();
+                
+                if (result.exists) {
+                    // File esiste, apri direttamente
+                    openExcel();
+                } else {
+                    // File non esiste, chiedi conferma per crearlo
+                    if (confirm('⚠️ Vuoi creare il file Excel?')) {
+                        executeCommand('commandExcel', 'outputExcel');
+                    }
+                }
+            } catch {
+                // In caso di errore, chiedi conferma per creare
+                if (confirm('⚠️ Vuoi creare il file Excel?')) {
+                    executeCommand('commandExcel', 'outputExcel');
+                }
+            }
+        }
+
+        async function executeCommand(commandId, outputId) {
+            const commandElement = document.getElementById(commandId);
+            const outputElement = document.getElementById(outputId);
+            const command = commandElement.textContent.trim();
+
+            outputElement.classList.remove('hidden', 'error', 'success');
+            outputElement.textContent = '⏳ Elaborazione in corso...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/execute`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command })
+                });
+
+                const result = await response.json();
+                let text = (result.stdout || '') + (result.stderr || '');
+
+                if (result.success && result.returncode === 0) {
+                    outputElement.classList.add('success');
+                    outputElement.textContent = '✅ Operazione completata con successo!';
+                    showAlert('Operazione completata!', 'success');
+                } else {
+                    outputElement.classList.add('error');
+                    outputElement.textContent = '❌ Si è verificato un errore durante l\'operazione.';
+                    showAlert('Errore durante l\'operazione', 'error');
+                }
+            } catch {
+                outputElement.classList.add('error');
+                outputElement.textContent = '❌ Server non raggiungibile.';
+                showAlert('Server non raggiungibile', 'error');
+            }
+        }
+
+        async function generatePDF(tipo) {
+            const outputElement = document.getElementById('outputPdf');
+            const commands = {
+                aule: 'echo "1" | python3 genera_stampe_pdf.py',
+                formatori: 'echo "2" | python3 genera_stampe_pdf.py',
+                corsi: 'echo "3" | python3 genera_stampe_pdf.py',
+                settimanale: 'echo "4" | python3 genera_stampe_pdf.py',
+                formatore_spec: 'echo "5" | python3 genera_stampe_pdf.py',
+                corso_spec: 'echo "6" | python3 genera_stampe_pdf.py',
+                tutti: 'echo "7" | python3 genera_stampe_pdf.py',
+            };
+
+            const command = commands[tipo];
+            document.getElementById('pdfMenu').classList.add('hidden');
+
+            outputElement.classList.remove('hidden', 'error', 'success');
+            outputElement.textContent = '⏳ Generazione PDF in corso...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/execute`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command })
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.returncode === 0) {
+                    outputElement.classList.add('success');
+                    outputElement.textContent = '✅ PDF generati con successo!';
+                    showAlert('PDF generati!', 'success');
+                } else {
+                    outputElement.classList.add('error');
+                    outputElement.textContent = '❌ Errore durante la generazione dei PDF.';
+                    showAlert('Errore PDF', 'error');
+                }
+            } catch {
+                outputElement.classList.add('error');
+                outputElement.textContent = '❌ Impossibile connettersi al server.';
+                showAlert('Server non raggiungibile', 'error');
+            }
+        }
+
+        function showPdfMenu() {
+            document.getElementById('pdfMenu').classList.toggle('hidden');
+        }
+
+
+
+        async function openExcel() {
+            const response = await fetch(`${API_URL}/api/open-file`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filepath: 'Pianificazione_Corsi_2026.xlsx' })
+            });
+            const res = await response.json();
+            showAlert(res.success ? 'Excel aperto!' : 'File non trovato', res.success ? 'success' : 'error');
+        }
+
+        async function openPdfFolder() {
+            const response = await fetch(`${API_URL}/api/open-file`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filepath: 'stampe_pdf' })
+            });
+            const res = await response.json();
+            showAlert(res.success ? 'Cartella aperta!' : 'Cartella non trovata', res.success ? 'success' : 'error');
+        }
+
+
+
+        async function checkExistingPdfs() {
+            try {
+                const response = await fetch(`${API_URL}/api/list-pdfs`);
+                const result = await response.json();
+                
+                const pdfList = document.getElementById('pdfList');
+                const existingPdfs = document.getElementById('existingPdfs');
+                
+                if (result.pdfs && result.pdfs.length > 0) {
+                    pdfList.innerHTML = '';
+                    result.pdfs.forEach(pdf => {
+                        const pdfItem = document.createElement('div');
+                        pdfItem.className = 'pdf-item';
+                        pdfItem.innerHTML = `
+                            <div>
+                                <span class="filename">${pdf.name}</span>
+                                <span class="filesize">(${pdf.size})</span>
+                            </div>
+                            <button onclick="openPdfFolder()" class="btn btn-secondary">📂 Apri Cartella</button>
+                        `;
+                        pdfList.appendChild(pdfItem);
+                    });
+                    existingPdfs.style.display = 'block';
+                } else {
+                    existingPdfs.style.display = 'none';
+                }
+            } catch {
+                document.getElementById('existingPdfs').style.display = 'none';
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertsDiv = document.getElementById('alerts');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertsDiv.appendChild(alert);
+            
+            // Rimuovi dopo 4 secondi
+            setTimeout(() => {
+                alert.remove();
+            }, 4000);
+        }
+
+        // Carica liste corsi e formatori
+        async function caricaListeOpzioni() {
+            try {
+                // Carica formatori
+                const respForm = await fetch(`${API_URL}/api/execute`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command: 'python3 genera_pdf_interattivo.py lista_formatori' })
+                });
+                const dataForm = await respForm.json();
+                if (dataForm.success && dataForm.stdout) {
+                    const formatori = JSON.parse(dataForm.stdout).formatori;
+                    const select = document.getElementById('select_formatore');
+                    select.innerHTML = '<option value="">-- Seleziona Formatore --</option>';
+                    formatori.forEach(f => {
+                        const opt = document.createElement('option');
+                        opt.value = f;
+                        opt.textContent = f;
+                        select.appendChild(opt);
+                    });
+                }
+
+                // Carica corsi
+                const respCorsi = await fetch(`${API_URL}/api/execute`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command: 'python3 genera_pdf_interattivo.py lista_corsi' })
+                });
+                const dataCorsi = await respCorsi.json();
+                if (dataCorsi.success && dataCorsi.stdout) {
+                    const corsi = JSON.parse(dataCorsi.stdout).corsi;
+                    const select = document.getElementById('select_corso');
+                    select.innerHTML = '<option value="">-- Seleziona Corso --</option>';
+                    corsi.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c;
+                        opt.textContent = c;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (e) {
+                console.error('Errore caricamento liste:', e);
+            }
+        }
+
+        async function generaPDFAule() {
+            const dataInizio = document.getElementById('input_aule_data_inizio').value.trim();
+            const dataFine = document.getElementById('input_aule_data_fine').value.trim();
+            
+            if (!dataInizio || !dataFine) {
+                showAlert('Inserisci data inizio e data fine', 'error');
+                return;
+            }
+
+            const outputElement = document.getElementById('outputPdf');
+            outputElement.classList.remove('hidden', 'error', 'success');
+            outputElement.textContent = '⏳ Generazione PDF aule in corso...';
+
+            const command = `python3 genera_pdf_interattivo.py genera_aule_periodo "${dataInizio}" "${dataFine}"`;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/execute`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command })
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.returncode === 0) {
+                    outputElement.classList.add('success');
+                    outputElement.textContent = '✅ PDF aule generato con successo!';
+                    showAlert('PDF generato!', 'success');
+                    checkExistingPdfs();
+                } else {
+                    outputElement.classList.add('error');
+                    outputElement.textContent = '❌ Errore durante la generazione del PDF.';
+                    showAlert('Errore generazione PDF', 'error');
+                }
+            } catch (error) {
+                console.error('Errore generazione PDF aule:', error);
+                outputElement.classList.add('error');
+                outputElement.textContent = '❌ Impossibile connettersi al server.';
+                showAlert('Server non raggiungibile', 'error');
+            }
+        }
+
+        async function generaPDFFormatore() {
+            const formatore = document.getElementById('select_formatore').value;
+            if (!formatore) {
+                showAlert('Seleziona un formatore', 'error');
+                return;
+            }
+
+            const dataInizio = document.getElementById('input_data_inizio').value || 'null';
+            const dataFine = document.getElementById('input_data_fine').value || 'null';
+
+            const outputElement = document.getElementById('outputPdf');
+            outputElement.classList.remove('hidden', 'error', 'success');
+            outputElement.textContent = `⏳ Generazione PDF per ${formatore}...`;
+
+            const command = `python3 genera_pdf_interattivo.py genera_formatore "${formatore}" "${dataInizio}" "${dataFine}"`;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/execute`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command })
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.returncode === 0) {
+                    outputElement.classList.add('success');
+                    outputElement.textContent = `✅ PDF per ${formatore} generato con successo!`;
+                    showAlert('PDF generato!', 'success');
+                    checkExistingPdfs();
+                } else {
+                    outputElement.classList.add('error');
+                    outputElement.textContent = '❌ Errore durante la generazione del PDF.';
+                    showAlert('Errore generazione PDF', 'error');
+                }
+            } catch (error) {
+                console.error('Errore generazione PDF formatore:', error);
+                outputElement.classList.add('error');
+                outputElement.textContent = '❌ Impossibile connettersi al server.';
+                showAlert('Server non raggiungibile', 'error');
+            }
+        }
+
+        async function generaPDFCorso() {
+            const corso = document.getElementById('select_corso').value;
+            if (!corso) {
+                showAlert('Seleziona un corso', 'error');
+                return;
+            }
+
+            const outputElement = document.getElementById('outputPdf');
+            outputElement.classList.remove('hidden', 'error', 'success');
+            outputElement.textContent = `⏳ Generazione PDF per corso ${corso}...`;
+
+            const command = `python3 genera_pdf_interattivo.py genera_corso "${corso}"`;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/execute`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command })
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.returncode === 0) {
+                    outputElement.classList.add('success');
+                    outputElement.textContent = `✅ PDF per ${corso} generato con successo!`;
+                    showAlert('PDF generato!', 'success');
+                    checkExistingPdfs();
+                } else {
+                    outputElement.classList.add('error');
+                    outputElement.textContent = '❌ Errore durante la generazione del PDF.';
+                    showAlert('Errore generazione PDF', 'error');
+                }
+            } catch (error) {
+                console.error('Errore generazione PDF corso:', error);
+                outputElement.classList.add('error');
+                outputElement.textContent = '❌ Impossibile connettersi al server.';
+                showAlert('Server non raggiungibile', 'error');
+            }
+        }
+
+        async function generaPDFTuttiFormatori() {
+            const outputElement = document.getElementById('outputPdf');
+            outputElement.classList.remove('hidden', 'error', 'success');
+            outputElement.textContent = '⏳ Generazione PDF per tutti i formatori...';
+
+            const command = 'python3 genera_pdf_interattivo.py genera_tutti_formatori';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/execute`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command })
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.returncode === 0) {
+                    outputElement.classList.add('success');
+                    outputElement.textContent = '✅ PDF per tutti i formatori generati!';
+                    showAlert('PDF generati!', 'success');
+                    checkExistingPdfs();
+                } else {
+                    outputElement.classList.add('error');
+                    outputElement.textContent = '❌ Errore durante la generazione dei PDF.';
+                    showAlert('Errore generazione PDF', 'error');
+                }
+            } catch (error) {
+                console.error('Errore generazione PDF tutti formatori:', error);
+                outputElement.classList.add('error');
+                outputElement.textContent = '❌ Impossibile connettersi al server.';
+                showAlert('Server non raggiungibile', 'error');
+            }
+        }
+
+        async function generaPDFSettimanale() {
+            const outputElement = document.getElementById('outputPdf');
+            outputElement.classList.remove('hidden', 'error', 'success');
+            outputElement.textContent = '⏳ Generazione report settimanali...';
+
+            const command = 'python3 genera_pdf_interattivo.py genera_settimanale';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/execute`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command })
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.returncode === 0) {
+                    outputElement.classList.add('success');
+                    outputElement.textContent = '✅ Report settimanali generati!';
+                    showAlert('PDF generati!', 'success');
+                    checkExistingPdfs();
+                } else {
+                    outputElement.classList.add('error');
+                    outputElement.textContent = '❌ Errore durante la generazione dei PDF.';
+                    showAlert('Errore generazione PDF', 'error');
+                }
+            } catch (error) {
+                console.error('Errore generazione PDF settimanale:', error);
+                outputElement.classList.add('error');
+                outputElement.textContent = '❌ Impossibile connettersi al server.';
+                showAlert('Server non raggiungibile', 'error');
+            }
+        }
+
+        function showSection(sectionId) {
+            // Nasconde tutte le sezioni
+            const sections = document.querySelectorAll('.card');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Mostra la sezione selezionata
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+                
+                // Carica PDF esistenti e liste se si apre la sezione PDF
+                if (sectionId === 'pdf') {
+                    checkExistingPdfs();
+                    caricaListeOpzioni();
+                }
+            }
+            
+            // Aggiorna il menu attivo
+            const menuLinks = document.querySelectorAll('.menu a');
+            menuLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Trova il link corrispondente e lo attiva
+            const activeLink = document.querySelector(`.menu a[onclick*="${sectionId}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+            
+            // Gestione speciale per il link Dashboard
+            if (sectionId === 'dashboard') {
+                document.querySelector('.menu a:first-child').classList.add('active');
+            }
+        }
+
+        window.addEventListener('load', () => {
+            showAlert('Benvenuto! Puoi iniziare.', 'info');
+            
+            // Imposta date di default per i selettori
+            const oggi = new Date();
+            const primoGennaio = new Date(2026, 0, 1); // 1 gennaio 2026
+            const ultimoDicembre = new Date(2026, 11, 31); // 31 dicembre 2026
+            
+            // Formato YYYY-MM-DD per input date
+            const formatDate = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+            
+            // Imposta valori di default
+            if (document.getElementById('input_aule_data_inizio')) {
+                document.getElementById('input_aule_data_inizio').value = formatDate(primoGennaio);
+            }
+            if (document.getElementById('input_aule_data_fine')) {
+                document.getElementById('input_aule_data_fine').value = formatDate(ultimoDicembre);
+            }
+            if (document.getElementById('input_data_inizio')) {
+                document.getElementById('input_data_inizio').value = formatDate(primoGennaio);
+            }
+            if (document.getElementById('input_data_fine')) {
+                document.getElementById('input_data_fine').value = formatDate(ultimoDicembre);
+            }
+        });
+    </script>
+
+</body>
+</html>

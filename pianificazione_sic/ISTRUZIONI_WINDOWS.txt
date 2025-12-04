@@ -1,0 +1,68 @@
+═══════════════════════════════════════════════════════════════
+   📦 PIANIFICAZIONE CORSI 2026 - GUIDA RAPIDA WINDOWS
+═══════════════════════════════════════════════════════════════
+
+🚀 INSTALLAZIONE (PRIMA VOLTA)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Estrai lo ZIP in una cartella (es: C:\Pianificazione_Corsi)
+
+2. Doppio clic su: installa_dipendenze.bat
+   
+   ➤ Installa automaticamente:
+     • Python 3.11.7 (se mancante)
+     • Librerie necessarie (openpyxl, reportlab)
+   
+   ⏱️  Tempo: 2-5 minuti
+   ✅ Attendi il messaggio "Installazione completata!"
+
+
+📋 USO QUOTIDIANO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Doppio clic su: avvia.bat
+   
+   ➤ Si apre automaticamente il browser
+   
+2. Usa l'interfaccia web per:
+   • Generare PDF per aule/formatori/corsi
+   • Creare stampe settimanali
+   • Gestire pianificazione interattiva
+
+
+📂 FILE IMPORTANTI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+installa_dipendenze.bat   ← Esegui SOLO la prima volta
+avvia.bat                  ← Esegui SEMPRE per usare il programma
+Pianificazione_Corsi_2026.xlsx ← File Excel con i dati
+stampe_pdf/                ← Cartella PDF generati
+
+
+❓ PROBLEMI COMUNI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ "export non è riconosciuto"
+   → Stai aprendo avvia.sh invece di avvia.bat
+   → Assicurati di fare doppio clic su avvia.bat
+
+❌ "Python non trovato"
+   → Ri-esegui installa_dipendenze.bat
+   → Riavvia il computer dopo l'installazione
+
+❌ "Porta 8765 già in uso"
+   → Chiudi altre istanze del programma
+   → Riavvia il computer se persiste
+
+
+🔒 REQUISITI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Windows 10 o superiore
+✅ 50 MB spazio libero
+✅ Connessione internet (solo per installazione iniziale)
+
+
+═══════════════════════════════════════════════════════════════
+            Versione 1.0 - Dicembre 2025
+═══════════════════════════════════════════════════════════════
